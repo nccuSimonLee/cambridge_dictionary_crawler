@@ -14,6 +14,8 @@ BOT_NAME = 'ScrambleDict'
 SPIDER_MODULES = ['ScrambleDict.spiders']
 NEWSPIDER_MODULE = 'ScrambleDict.spiders'
 
+LOG_LEVEL='INFO'
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'ScrambleDict (+http://www.yourdomain.com)'

@@ -28,7 +28,8 @@ class POSBlock(object):
 
     def fetch_pos_tag(self):
         header_block_bs = find_all(self.pos_block_bs, 'pos-header')[0]
-        pos_tag = header_block_bs.select('.pos')[0].text
+        pos_tag_block_bs = header_block_bs.select('.pos')
+        pos_tag = pos_tag_block_bs[0].text if pos_tag_block_bs else ''
         return pos_tag
 
     def fetch_big_sense_blocks(self):
@@ -78,9 +79,9 @@ class BigSenseBlock(object):
 
 def fetch_def_and_examples(sense_block_bs: BeautifulSoup):
     sense_head_block_bs = find_all(sense_block_bs, 'ddef_h')[0]
-    en_def = find_all(sense_head_block_bs, 'ddef_d')[0].text
+    en_def = fetch_text(sense_head_block_bs, 'ddef_d')
     sense_body_block_bs = find_all(sense_block_bs, 'ddef_b')[0]
-    ch_def = find_all(sense_body_block_bs, 'dtrans')[0].text
+    ch_def = fetch_text(sense_body_block_bs, 'dtrans')
     example_blocks_bs = find_all(sense_body_block_bs, 'dexamp')
     example_sents = fetch_example_sents(example_blocks_bs)
     return (en_def, ch_def, example_sents)
@@ -88,13 +89,16 @@ def fetch_def_and_examples(sense_block_bs: BeautifulSoup):
 def fetch_example_sents(example_blocks_bs: BeautifulSoup):
     example_sents = []
     for block_bs in example_blocks_bs:
-        en_sent_bs = find_all(block_bs, 'deg')
-        en_sent = en_sent_bs[0].text if en_sent_bs else ''
-        ch_sent_bs = find_all(block_bs, 'dtrans')
-        ch_sent = ch_sent_bs[0].text if ch_sent_bs else ''
+        en_sent = fetch_text(block_bs, 'deg')
+        ch_sent = fetch_text(block_bs, 'dtrans')
         example_sents.append({'en': en_sent,
                               'ch': ch_sent})
     return example_sents
+
+def fetch_text(bs, _class):
+    text_block = find_all(bs, _class)
+    text = text_block[0].text if text_block else ''
+    return text
 
 
 class SenseBlock(object):
@@ -108,8 +112,7 @@ class SenseBlock(object):
         info_block_bs = find_all(sense_head_block_bs, 'ddef-info')
         level = ''
         if info_block_bs:
-            level_block_bs = find_all(info_block_bs[0], 'dxref')
-            level = level_block_bs[0].text.strip() if level_block_bs else ''
+            level = fetch_text(info_block_bs[0], 'dxref').strip()
         return level
 
 
@@ -126,8 +129,7 @@ class PhraseBlock(object):
         info_block_bs = find_all(phrase_head_block_bs, 'dphrase-info')
         level = ''
         if info_block_bs:
-            level_block_bs = find_all(info_block_bs[0], 'dxref')
-            level = level_block_bs[0].text if level_block_bs else ''
+            level = fetch_text(info_block_bs[0], 'dxref').strip()
         return (term, level)
 
     def fetch_phrase_sense_blocks_bs(self):

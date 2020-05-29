@@ -88,9 +88,12 @@ def fetch_def_and_examples(sense_block_bs: BeautifulSoup):
 def fetch_example_sents(example_blocks_bs: BeautifulSoup):
     example_sents = []
     for block_bs in example_blocks_bs:
-        en_sent = find_all(block_bs, 'deg')[0].text
-        ch_sent = find_all(block_bs, 'dtrans')[0].text
-        example_sents.extend([en_sent, ch_sent])
+        en_sent_bs = find_all(block_bs, 'deg')
+        en_sent = en_sent_bs[0].text if en_sent_bs else ''
+        ch_sent_bs = find_all(block_bs, 'dtrans')
+        ch_sent = ch_sent_bs[0].text if ch_sent_bs else ''
+        example_sents.append({'en': en_sent,
+                              'ch': ch_sent})
     return example_sents
 
 

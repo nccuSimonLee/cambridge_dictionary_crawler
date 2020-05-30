@@ -37,3 +37,25 @@ class POSBlock(POSBlockAPI):
         big_sense_blocks = find_all(body_block_bs, 'dsense')
         big_sense_blocks = [BigSenseBlock(block_bs) for block_bs in big_sense_blocks]
         return big_sense_blocks
+
+
+class PhraseVerbBlock(POSBlockAPI):
+    def __init__(self, pos_block_bs: BeautifulSoup):
+        self.pv_block_bs = pos_block_bs.select('.pv-block')
+        assert len(self.pv_block_bs) == 1
+        self.pv_block_bs = self.pv_block_bs[0]
+        super(PhraseVerbBlock, self).__init__(pos_block_bs)
+        return
+    
+    def fetch_pos_tag(self):
+        info_block_bs = find_all(self.pv_block_bs, 'di-info')[0]
+        header_block_bs = find_all(info_block_bs, 'pos-header')[0]
+        pos_tag_block_bs = header_block_bs.select('.pos')
+        pos_tag = pos_tag_block_bs[0].text if pos_tag_block_bs else ''
+        return pos_tag
+
+    def fetch_big_sense_blocks(self):
+        body_block_bs = find_all(self.pv_block_bs, 'dpv-body')[0]
+        big_sense_blocks = find_all(body_block_bs, 'dsense')
+        big_sense_blocks = [BigSenseBlock(block_bs) for block_bs in big_sense_blocks]
+        return big_sense_blocks

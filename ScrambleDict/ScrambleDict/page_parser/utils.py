@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 def find_all(bs, _class):
     return bs.findAll(attrs={'class': _class}, recursive=False)
 
@@ -8,12 +11,21 @@ def fetch_text(bs, _class):
     return text
 
 def fetch_vocab_data(vocab_page):
-    vocab_data = {}
+    vocab_data = defaultdict(lambda: [])
     for pos_block in vocab_page.pos_blocks:
-        big_sense_data_list = [fetch_big_sense_data(big_sense_block)
-                               for big_sense_block in pos_block.big_sense_blocks]
-        vocab_data[pos_block.pos_tag] = big_sense_data_list
+        pos_data = fetch_pos_data(pos_block)
+        for pos_tag in pos_block.pos_tag:
+            vocab_data[pos_tag].append(pos_data)
     return vocab_data
+
+def fetch_pos_data(pos_block):
+    big_sense_data_list = [fetch_big_sense_data(big_sense_block)
+                           for big_sense_block in pos_block.big_sense_blocks]
+    pos_data = {
+        'headword': pos_block.headword,
+        'big_sense': big_sense_data_list,
+    }
+    return pos_data
 
 def fetch_big_sense_data(big_sense_block):
     big_sense_data = {

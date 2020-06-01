@@ -40,7 +40,9 @@ class POSBlock(POSBlockAPI):
     def fetch_pos_tag(self):
         header_block_bs = find_all(self.pos_block_bs, 'pos-header')[0]
         pos_tag_block_bs = header_block_bs.select('.pos')
-        pos_tag = pos_tag_block_bs[0].text if pos_tag_block_bs else ''
+        pos_tag = [pos_tag.text for pos_tag in pos_tag_block_bs]
+        if not pos_tag:
+            pos_tag = ['']
         return pos_tag
 
     def fetch_big_sense_blocks(self):
@@ -67,11 +69,32 @@ class PhraseVerbBlock(POSBlockAPI):
         info_block_bs = find_all(self.pv_block_bs, 'di-info')[0]
         header_block_bs = find_all(info_block_bs, 'pos-header')[0]
         pos_tag_block_bs = header_block_bs.select('.pos')
-        pos_tag = pos_tag_block_bs[0].text if pos_tag_block_bs else ''
+        pos_tag = [pos_tag.text for pos_tag in pos_tag_block_bs]
+        if not pos_tag:
+            pos_tag = ['']
         return pos_tag
 
     def fetch_big_sense_blocks(self):
         body_block_bs = find_all(self.pv_block_bs, 'dpv-body')[0]
+        big_sense_blocks = find_all(body_block_bs, 'dsense')
+        big_sense_blocks = [BigSenseBlock(block_bs) for block_bs in big_sense_blocks]
+        return big_sense_blocks
+
+
+class IdiomBlock(POSBlockAPI):
+    def __init__(self, pos_block_bs: BeautifulSoup):
+        super(IdiomBlock, self).__init__(pos_block_bs)
+
+    def fetch_head_word(self):
+        title_bs = self.pos_block_bs.select('.di-title')[0]
+        head_word = title_bs.select('.dpos-h_hw')[0].text
+        return head_word 
+
+    def fetch_pos_tag(self):
+        return ['idiom']
+    
+    def fetch_big_sense_blocks(self):
+        body_block_bs = find_all(self.pos_block_bs, 'didiom-body')[0]
         big_sense_blocks = find_all(body_block_bs, 'dsense')
         big_sense_blocks = [BigSenseBlock(block_bs) for block_bs in big_sense_blocks]
         return big_sense_blocks

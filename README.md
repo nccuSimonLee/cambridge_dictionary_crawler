@@ -12,7 +12,7 @@
 
 ### Hypothesis
 
-        目前看來單字網頁的組成形式應該是
+目前看來單字網頁的組成形式應該是
 
 - POS block
     - big sense block
@@ -27,7 +27,7 @@
 
 ### Working logic
 
-        爬取一個網頁資料的流程如下：
+爬取一個網頁資料的流程如下：
 
 1. 抓出所有的 pos blocks
 2. 針對一個 pos block 做處理，抓出 big sense blocks
@@ -42,10 +42,7 @@
 7. 回到第二步，直到所有 pos blocks 都被處理過
 
 ### Proposed works
-
-        對上述的每種 block 設計一個 class，負責執行上面提到的工作。除了最底層的 block (sense block and phrase block) 以外，都要抓出某些更底層的 block。而如果將抽取資料以及更底層 block 的動作放在 instantiation 中的話，就會產生上面 working logic 的效果。
-
-        最頂層的 class 就是 page of vocabulary。它擁有自己的一些資料，以及 POS blocks。而每個 POS block 也同樣地擁有自己的資料以及 big sense blocks，以此類推。舉例來說，當 instantiate bank 這個詞的 vocabulary page 的時候，它就會 instantiate POS blocks，而在 instantiate 每個 POS blocks 的時候，它們又會去 instantiate big sense blocks，以此類推。從而產生類似 for loop 的效果，但我們又能夠分別對各個 class 進行設計，提高了可維護性。
+對上述的每種 block 設計一個 class，負責執行上面提到的工作。除了最底層的 block (sense block and phrase block) 以外，都要抓出某些更底層的 block。而如果將抽取資料以及更底層 block 的動作放在 instantiation 中的話，就會產生上面 working logic 的效果。 最頂層的 class 就是 page of vocabulary。它擁有自己的一些資料，以及 POS blocks。而每個 POS block 也同樣地擁有自己的資料以及 big sense blocks，以此類推。舉例來說，當 instantiate bank 這個詞的 vocabulary page 的時候，它就會 instantiate POS blocks，而在 instantiate 每個 POS blocks 的時候，它們又會去 instantiate big sense blocks，以此類推。從而產生類似 for loop 的效果，但我們又能夠分別對各個 class 進行設計，提高了可維護性。
 
 # 用來代表一個 vocab page 的 classes
 

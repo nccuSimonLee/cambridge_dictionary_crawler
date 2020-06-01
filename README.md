@@ -1,3 +1,81 @@
+# Quick start
+```
+cd ScrambleDict  # 與 generate_final_data.py 在同一個目錄底下
+scrapy crawl vocab_urls_spider -o vocab_urls.csv
+scrapy crawl vocab_pages_spider -o vocab_data.json
+python generate_final_data.py
+```
+
+# Data schema
+## Json
+
+```json
+{
+    vocab: {
+        pos_tag: [
+            {
+                headword: str,
+                big_sense: [
+                    {
+                        guideword: str,
+                        sense: [
+                            {
+                                en_def: str,
+                                ch_def: str,
+                                level: str,
+								gcs: str,
+                                examples: [
+                                    {
+                                        en: str,
+                                        ch: str,
+                                    }
+                                ]
+                            }
+                        ],
+                        phrase: [
+                            {
+                                term: str,
+                                level: str,
+                                sense: [
+                                    {
+                                        en_def: str,
+                                        ch_def: str,
+                                        examples: [
+                                            {
+                                                en: str,
+                                                ch: str
+                                            }
+                                        ]
+                                    }
+                                ]
+
+                            }
+                        ],
+                        extra_sents: [str]
+                    }
+                ]
+            }
+        ]
+    }
+}
+```
+
+上面為整個資料集的 json schema，下面是取出資料的範例
+
+```python
+data['back']['noun'][0]['big_sense'][0]['sense'][0]['examples'][0]['en']
+>>>
+'He jotted her name down on the back of an envelope.'
+```
+
+這行指令取出的資料為 back 這個單字在詞性為 noun 時的第一個 POS block 的第一個 big sense 下的第一個 sense 的第一個例句的英文。  
+
+新資料的 json schema 與舊資料最大的不同在於，各個網頁中包含的詞彙資料在舊資料中沒有統一的 index，而是直接用 headword 當作是第一層 key。  
+但是新資料用 url 的最後一個部分當作是 index，而在 POS block 的部分加上 headword 這個 field。同時新資料的 POS block 部分是一個包含
+dictionary 的 list，這是因為在網頁中可能會有不同的 POS block 指涉同一個 POS tag。  
+另外一個些微的差異是，舊資料的例句是直接用一個 list 來表示，其中英中交錯。而新資料則對每一個例句的 pair 用一個 dictionary 來表示，這是因為有些例句會缺少中文翻譯。
+
+
 # Observations
 
 ## 範例網頁

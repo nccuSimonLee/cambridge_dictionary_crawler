@@ -8,9 +8,14 @@ from .big_sense_block import BigSenseBlock
 class POSBlockAPI(ABC):
     def __init__(self, pos_block_bs: BeautifulSoup):
         self.pos_block_bs = pos_block_bs
+        self.headword = self.fetch_head_word()
         self.pos_tag = self.fetch_pos_tag()
         self.big_sense_blocks = self.fetch_big_sense_blocks()
         return
+
+    @abstractmethod
+    def fetch_head_word(self):
+        pass
 
     @abstractmethod
     def fetch_pos_tag(self):
@@ -25,6 +30,12 @@ class POSBlock(POSBlockAPI):
     def __init__(self, pos_block_bs: BeautifulSoup):
         super(POSBlock, self).__init__(pos_block_bs)
         return
+
+    def fetch_head_word(self):
+        header_bs = self.pos_block_bs.select('.pos-header')
+        title_bs = header_bs[0].select('.di-title')[0]
+        head_word = title_bs.select('.dpos-h_hw')[0].text
+        return head_word
 
     def fetch_pos_tag(self):
         header_block_bs = find_all(self.pos_block_bs, 'pos-header')[0]
@@ -46,6 +57,11 @@ class PhraseVerbBlock(POSBlockAPI):
         self.pv_block_bs = self.pv_block_bs[0]
         super(PhraseVerbBlock, self).__init__(pos_block_bs)
         return
+
+    def fetch_head_word(self):
+        title_bs = self.pv_block_bs.select('.di-title')[0]
+        head_word = title_bs.select('.dpos-h_hw')[0].text
+        return head_word
     
     def fetch_pos_tag(self):
         info_block_bs = find_all(self.pv_block_bs, 'di-info')[0]

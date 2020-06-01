@@ -25,15 +25,21 @@ class SenseBlock(object):
     def __init__(self, sense_block_bs: BeautifulSoup):
         self.sense_block_bs = sense_block_bs
         self.en_def, self.ch_def, self.examples = fetch_def_and_examples(sense_block_bs)
-        self.level = self.fetch_sense_level()
+        self.level, self.gcs = self.fetch_sense_level_and_gcs()
 
-    def fetch_sense_level(self):
+    def fetch_sense_level_and_gcs(self):
         sense_head_block_bs = find_all(self.sense_block_bs, 'ddef_h')[0]
         info_block_bs = find_all(sense_head_block_bs, 'ddef-info')
-        level = ''
+        level, gcs = '', ''
         if info_block_bs:
             level = fetch_text(info_block_bs[0], 'dxref').strip()
-        return level
+            dgram_block_bs = find_all(info_block_bs[0], 'dgram')
+            if dgram_block_bs:
+                gcs = dgram_block_bs[0].text
+                gcs = gcs.replace('[ ', '')
+                gcs = gcs.replace(' ]', '')
+        return (level, gcs)
+
 
 
 class PhraseBlock(object):

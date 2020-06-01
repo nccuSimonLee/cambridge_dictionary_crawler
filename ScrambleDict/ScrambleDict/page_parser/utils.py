@@ -43,6 +43,7 @@ def fetch_sense_data(sense_block):
         'en_def': sense_block.en_def,
         'ch_def': sense_block.ch_def,
         'level': sense_block.level,
+        'gcs': sense_block.gcs,
         'examples': sense_block.examples
     }
     return sense_data
